@@ -10,8 +10,8 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
-import { Model } from 'mongoose';
 import { Server, Socket } from 'socket.io';
+import { SocketGateway } from './socket.gateway';
 
 import { User } from './user';
 import { UserRepository } from './user.repository';
@@ -33,8 +33,7 @@ class ConnectUserPayload {
 
 @Controller()
 export class UserController {
-  constructor(private readonly _userRepository: UserRepository, @InjectModel('User')
-  private readonly _userModel: Model<User>,) { }
+  constructor(private readonly _userRepository: UserRepository, @InjectModel('User') private readonly socketGateway: SocketGateway) { }
 
   @WebSocketServer() server: Server;
 
@@ -99,42 +98,27 @@ export class UserController {
     }
   }
 
-  // @Post('connect')
-  // async createConnection(@Body() payload: ConnectUserPayload): Promise<{ message: string }> {
-  //   if (!payload.userName) {
-  //     throw new BadRequestException('No username was provided.');
-  //   }
+  @Post('connect')
+  async connectUsers(@Body() payload: ConnectUserPayload): Promise<void> {
+    const user = await this._userRepository.findOne({ userName: payload.userName });
+    const userToConnect = await this._userRepository.findOne({ userName: payload.userToConnectWith });
 
-  //   try {
-  //     await this._userRepository.createConnection(
-  //       payload.userName,
-  //       payload.userToConnectWith
-  //     );
-  //     return { message: 'User successfully logged In' };
-  //   } catch (err) {
-  //     throw new HttpException(
-  //       err.message,
-  //       HttpStatus.CONFLICT,
-  //     );
-  //   }
-  // }
+    // Check if both users exist
+    if (!user || !userToConnect) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
 
-  // @Post('connect')
-  // async createConnection(@Body() body: { userName: string; userToConnectWith: string }) {
-  //   const { userName, userToConnectWith } = body;
+    // Check if both users are active and not already in session
+    if (userToConnect.isActive && user.isActive && !userToConnect.isInSession && !user.isInSession) {
+      // Set isInSession property for both users
+      await this._userRepository.update({ _userName: userToConnect.userName }, { isInSession: true });
+      await this._userRepository.update({ _userName: user.userName }, { isInSession: true });
 
-  //   // Check if the other user is active and not in session
-  //   const isUserToConnectWithActiveAndNotInSession = await this.userService.checkIfUserToConnectWithIsActiveAndNotInSession(userToConnectWith);
+      // Create a socket connection between the two users
+      // this.socketGateway.createConnection(user, userToConnect);
+    } else {
+      throw new HttpException('Cannot connect users', HttpStatus.BAD_REQUEST);
+    }
+  }
 
-  //   if (!isUserToConnectWithActiveAndNotInSession) {
-  //     throw new Error('The user to connect with is not active or is in session.');
-  //   }
-
-  //   // Update the users' `isInSession` properties in the database
-  //   // ...
-
-  //   // Emit the `usersConnected` event to all connected clients
-  //   this.userService.connect(user1);
-  //   this.userService.connect(user2);
-  // }
 }

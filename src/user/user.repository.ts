@@ -66,4 +66,12 @@ export class UserRepository {
     console.log('>>>>>>111', existingUser)
 
   }
+
+  async findOne(filter: any): Promise<User> {
+    return await this._userModel.findOne(filter).exec();
+  }
+
+  async update(filter: any, update: any): Promise<void> {
+    await this._userModel.updateOne(filter, update).exec();
+  }
 }

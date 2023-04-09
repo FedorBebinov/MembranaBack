@@ -3,11 +3,13 @@ import { AppConfigurationService } from './infrastructure/configuration/app-conf
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { Module } from '@nestjs/common';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
 import { RouterModule, Routes } from '@nestjs/core';
 import { UserModule } from './user/user.module';
 import { UserController } from './user/user.controller';
 import { UserRepository } from './user/user.repository';
+import { SocketGateway } from './user/socket.gateway';
 
 
 @Module({
@@ -46,6 +48,6 @@ import { UserRepository } from './user/user.repository';
     UserModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, SocketGateway],
 })
 export class AppModule { }
