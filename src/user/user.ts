@@ -1,9 +1,9 @@
 import { Document } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-@Schema({ collection: 'paises' })
+@Schema({ collection: 'users' })
 class UserDocument {
-  @Prop()
+  @Prop({ required: true })
   userName: string;
 
   @Prop()

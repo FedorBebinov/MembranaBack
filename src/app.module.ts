@@ -4,10 +4,11 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { Module } from '@nestjs/common';
 import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
-import { RouterModule } from '@nestjs/core';
+import { RouterModule, Routes } from '@nestjs/core';
 import { UserModule } from './user/user.module';
 import { UserController } from './user/user.controller';
 import { UserRepository } from './user/user.repository';
+
 
 @Module({
   imports: [
@@ -26,8 +27,20 @@ import { UserRepository } from './user/user.repository';
     }),
     RouterModule.register([
       {
-        path: 'user',
-        module: UserModule,
+        path: 'register',
+        module: UserController,
+      },
+      {
+        path: 'login',
+        module: UserController,
+      },
+      {
+        path: 'update',
+        module: UserController,
+      },
+      {
+        path: 'connect',
+        module: UserController,
       },
     ]),
     UserModule,
@@ -35,4 +48,4 @@ import { UserRepository } from './user/user.repository';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
