@@ -18,7 +18,7 @@ import { UserRepository } from './user/user.repository';
       inject: [AppConfigurationService],
       useFactory: (appConfigService: AppConfigurationService) => {
         const options: MongooseModuleOptions = {
-          uri: appConfigService.connectionString,
+          uri: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/Membrana',
           useNewUrlParser: true,
           useUnifiedTopology: true,
         };
