@@ -46,7 +46,7 @@ import { GatewayModule } from './gateway/gateway.module';
         module: UserController,
       },
       {
-        path: 'updateUsername',//updated, ask Hayk to change
+        path: 'updateUsername',
         module: UserController,
       },
       {
