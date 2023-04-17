@@ -9,9 +9,6 @@ import {
   Get,
   Query,
 } from '@nestjs/common';
-import { WebSocketServer } from '@nestjs/websockets';
-import { Server } from 'socket.io';
-
 import { User } from './user';
 import { UserRepository } from './user.repository';
 
@@ -45,13 +42,9 @@ class GestureDataPayload {
 export class UserController {
   constructor(private readonly _userRepository: UserRepository) { }
 
-  @WebSocketServer() server: Server;
-
   @Post('register')
   async firstLaunch(@Body() payload: CreateUserPayload): Promise<{ message: string }> {
-    console.log('register user payload', payload)
     if (!payload.userName) {
-      console.log('no username provided in register')
       throw new BadRequestException('No username was provided.');
     }
 
@@ -61,8 +54,6 @@ export class UserController {
       );
       return { message: 'User successfully registered' };
     } catch (err) {
-      console.log('>>>>error in register', err)
-      // // MongoDB duplicate key error
       throw new HttpException(
         'This username already taken',
         HttpStatus.CONFLICT,
@@ -72,7 +63,6 @@ export class UserController {
 
   @Post('login')
   async login(@Body() payload: CreateUserPayload): Promise<{ message: string }> {
-    console.log('login user payload', payload)
     if (!payload.userName) {
       throw new BadRequestException('No username was provided.');
     }
@@ -92,7 +82,6 @@ export class UserController {
 
   @Put('logout')
   async logout(@Body() payload: CreateUserPayload): Promise<{ message: string }> {
-    console.log('logout user payload', payload)
     if (!payload.userName) {
       throw new BadRequestException('No username was provided.');
     }
@@ -113,7 +102,6 @@ export class UserController {
 
   @Get('users?')
   async checkingUserData(@Query('userName') userName: string): Promise<User> {
-    console.log('>>>>>get user info', userName)
     const user = await this._userRepository.getUserInfo(userName);
     return user;
   }
@@ -122,10 +110,8 @@ export class UserController {
   @Put('updateUsername')
   async updateUserName(@Body() payload: UpdateUserNamePayload): Promise<{ message: string }> {
     if (!payload.newUserName) {
-      console.log('no username provided in update')
       throw new BadRequestException('New username is not provided.');
     }
-    console.log('rename payload', payload)
     try {
       await this._userRepository.updateUserName(
         payload.userName,
@@ -133,7 +119,6 @@ export class UserController {
       );
       return { message: 'Username successfully updated' };
     } catch (err) {
-      console.log('>>>>error in update', err)
       throw new HttpException(
         err.message,
         HttpStatus.CONFLICT,
@@ -143,26 +128,21 @@ export class UserController {
 
   @Post('connect')
   async connectUsers(@Body() payload: ConnectUserPayload): Promise<User> {
-    console.log("connect user payload", payload)
     const userToConnect = await this._userRepository.findOne({ userName: payload.userToConnectWith });
 
-    // Check if user exist
     if (!userToConnect) {
-      console.log("User not found")
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
     const userToConnectIsInSession = userToConnect.isInSession;
 
     if (userToConnectIsInSession) {
-      console.log("User is in another active session")
       throw new HttpException('User is in another active session.', HttpStatus.CONFLICT);
     }
 
     const userIsOnline = userToConnect.isActive;
 
     if (!userIsOnline) {
-      console.log("User is offline.")
       throw new HttpException('User is offline.', HttpStatus.CONFLICT);
     }
 
@@ -173,7 +153,6 @@ export class UserController {
       );
       return updatedUser;
     } catch (err) {
-      console.log('>>>>error in connectUsers', err)
       throw new HttpException(
         err.message,
         HttpStatus.CONFLICT,
@@ -183,9 +162,7 @@ export class UserController {
 
   @Put('updateSessionStatus')
   async updateSessionStatus(@Body() payload: UpdateSessionStatusPayload): Promise<User> {
-    console.log('updateSessionStatus payload', payload)
     if (!payload.connections.length) {
-      console.log('There is no user in connections.')
       throw new BadRequestException('The connection array is empty.');
     }
 
@@ -196,7 +173,6 @@ export class UserController {
       );
       return updatedUser;
     } catch (err) {
-      console.log('>>>>error in update', err)
       throw new HttpException(
         err.message,
         HttpStatus.CONFLICT,
@@ -206,14 +182,12 @@ export class UserController {
 
   @Put('resetData')
   async resetUserData(@Body() payload): Promise<{ message: string }> {
-    console.log('resetUserData payload', payload)
     try {
       await this._userRepository.resetUserData(
         payload.userName,
       );
       return { message: 'User data reseted!' };
     } catch (err) {
-      console.log('>>>>error in  reset data', err)
       throw new HttpException(
         err.message,
         HttpStatus.CONFLICT,
@@ -223,7 +197,6 @@ export class UserController {
 
   @Post('sendData')
   async sendData(@Body() payload: GestureDataPayload): Promise<{ message: string }> {
-    console.log('sendData  payload', payload)
     const connectedUser = await this._userRepository.findOne({ userName: payload.connections[0] });
 
     if (!connectedUser.isInSession || !connectedUser.isActive || !connectedUser.connections.includes(payload.userName)) {

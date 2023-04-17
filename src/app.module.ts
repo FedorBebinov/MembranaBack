@@ -2,12 +2,11 @@ import { AppConfigurationModule } from './infrastructure/configuration/app-confi
 import { AppConfigurationService } from './infrastructure/configuration/app-configuration.service';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { Module, Param } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
 import { RouterModule } from '@nestjs/core';
 import { UserModule } from './user/user.module';
 import { UserController } from './user/user.controller';
-import { GatewayModule } from './gateway/gateway.module';
 
 @Module({
   imports: [
@@ -38,11 +37,11 @@ import { GatewayModule } from './gateway/gateway.module';
         module: UserController,
       },
       {
-        path: 'userName',//query path
+        path: 'userName',
         module: UserController,
       },
       {
-        path: 'resetData',//query path
+        path: 'resetData',
         module: UserController,
       },
       {
@@ -63,7 +62,6 @@ import { GatewayModule } from './gateway/gateway.module';
       },
     ]),
     UserModule,
-    GatewayModule,
   ],
   controllers: [AppController],
   providers: [AppService],
