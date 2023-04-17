@@ -17,4 +17,4 @@ import { userSchema } from './user';
   ],
   providers: [UserRepository],
 })
-export class UserModule {}
+export class UserModule { }

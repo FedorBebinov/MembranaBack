@@ -1,6 +1,7 @@
 import { Document } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Optional } from '@nestjs/common';
+import { Socket } from 'socket.io';
 
 @Schema({ collection: 'users' })
 class UserDocument {
@@ -17,11 +18,16 @@ class UserDocument {
 
   @Optional()
   @Prop()
-  userToConnectWith: string;
+  connections: string[];
 
-  // @Prop()
-  // pendingConnection: number | string;
+  @Optional()
+  @Prop()
+  drawingGestureType: number;
 
+
+  @Optional()
+  @Prop()
+  tapGestureLocation: number[];
   // @Prop()
   // clickType: number;
 }
@@ -29,3 +35,11 @@ class UserDocument {
 export type User = UserDocument & Document;
 
 export const userSchema = SchemaFactory.createForClass(UserDocument);
+
+export type AuthPayload = {
+  userName: string;
+  pollID: string;
+  name: string;
+};
+
+export type SocketWithAuth = Socket & AuthPayload;

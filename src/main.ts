@@ -5,8 +5,6 @@ import { WsAdapter } from '@nestjs/platform-ws';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  // app.useWebSocketAdapter(new WebSocketAdapter(app, true));
-  app.useWebSocketAdapter(new WsAdapter());
-  await app.listen(process.env.PORT || 3000);
+  await app.listen(3000);
 }
 bootstrap();

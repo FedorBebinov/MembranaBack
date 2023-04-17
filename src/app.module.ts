@@ -2,15 +2,12 @@ import { AppConfigurationModule } from './infrastructure/configuration/app-confi
 import { AppConfigurationService } from './infrastructure/configuration/app-configuration.service';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { Module } from '@nestjs/common';
-import { IoAdapter } from '@nestjs/platform-socket.io';
+import { Module, Param } from '@nestjs/common';
 import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
-import { RouterModule, Routes } from '@nestjs/core';
+import { RouterModule } from '@nestjs/core';
 import { UserModule } from './user/user.module';
 import { UserController } from './user/user.controller';
-import { UserRepository } from './user/user.repository';
-import { SocketGateway } from './user/socket.gateway';
-
+import { GatewayModule } from './gateway/gateway.module';
 
 @Module({
   imports: [
@@ -37,17 +34,38 @@ import { SocketGateway } from './user/socket.gateway';
         module: UserController,
       },
       {
-        path: 'update',
+        path: 'logout',
+        module: UserController,
+      },
+      {
+        path: 'userName',//query path
+        module: UserController,
+      },
+      {
+        path: 'resetData',//query path
+        module: UserController,
+      },
+      {
+        path: 'updateUsername',//updated, ask Hayk to change
         module: UserController,
       },
       {
         path: 'connect',
         module: UserController,
       },
+      {
+        path: 'updateSessionStatus',
+        module: UserController,
+      },
+      {
+        path: 'sendData',
+        module: UserController,
+      },
     ]),
     UserModule,
+    GatewayModule,
   ],
   controllers: [AppController],
-  providers: [AppService, SocketGateway],
+  providers: [AppService],
 })
 export class AppModule { }
